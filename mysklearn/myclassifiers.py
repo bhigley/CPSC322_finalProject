@@ -1,17 +1,20 @@
 ##############################################
 # Programmer: Matthew Moore
 # Class: CptS 322-01, Spring 2022
-# Programming Assignment #4
-# 3/3/2022
-# 
+# Programming Assignment # 6
+# 3/30/2022
 # 
 # Description: This program holds all of the blue print, class level code so we may call 
 # instances of various predictive tools for our datasets. All of these classes accept training 
 # data in the form of x and y, as well as seperate x values for testing purposes.  
 ##############################################
+from fileinput import filename
+from turtle import dot
 from mysklearn import myutils
-from mysklearn.mysimplelinearregressor import MySimpleLinearRegressor
 import operator as op
+import os
+import math
+import graphviz as gv
 
 class MySimpleLinearRegressionClassifier:
     """Represents a simple linear regression classifier that discretizes
@@ -127,7 +130,11 @@ class MyKNeighborsClassifier:
         # Calculates all X_train distances from the test instance
         for test_instance in X_test:
             for i, train_coordinates in enumerate(self.X_train):
-                neighbors.append([i,myutils.compute_euclidian_distance(train_coordinates,test_instance)])
+                try:
+                    neighbors.append([i,myutils.compute_euclidian_distance(train_coordinates,test_instance)])
+                except:
+                    # Case of categorical data
+                    neighbors.append([i,myutils.compute_euclidian_distance(train_coordinates,test_instance,categorical=True)])
             # Now we must sort the list based upon the distances
             neighbors.sort(key=op.itemgetter(-1))
             # Now we grab the k closest neighbors to this point
@@ -216,3 +223,189 @@ class MyDummyClassifier:
         """
         y_predicted = [self.most_common_label for test_instance in X_test]
         return y_predicted
+
+class MyNaiveBayesClassifier:
+    """Represents a Naive Bayes classifier.
+
+    Attributes:
+        priors(YOU CHOOSE THE MOST APPROPRIATE TYPE): The prior probabilities computed for each
+            label in the training set.
+        posteriors(YOU CHOOSE THE MOST APPROPRIATE TYPE): The posterior probabilities computed for each
+            attribute value/label pair in the training set.
+
+    Notes:
+        Loosely based on sklearn's Naive Bayes classifiers: https://scikit-learn.org/stable/modules/naive_bayes.html
+        You may add additional instance attributes if you would like, just be sure to update this docstring
+        Terminology: instance = sample = row and attribute = feature = column
+    """
+    def __init__(self):
+        """Initializer for MyNaiveBayesClassifier.
+        """
+        self.priors = None
+        self.posteriors = None
+
+    def fit(self, X_train, y_train):
+        """Fits a Naive Bayes classifier to X_train and y_train.
+
+        Args:
+            X_train(list of list of obj): The list of training instances (samples)
+                The shape of X_train is (n_train_samples, n_features)
+            y_train(list of obj): The target y values (parallel to X_train)
+                The shape of y_train is n_train_samples
+
+        Notes:
+            Since Naive Bayes is an eager learning algorithm, this method computes the prior probabilities
+                and the posterior probabilities for the training data.
+            You are free to choose the most appropriate data structures for storing the priors
+                and posteriors.
+        """
+        priors, value_list, count_list, values_list, counts_list = [], [], [], [], []
+        main_header = ["Attr" + str(i) for i, instance in enumerate(range(len(X_train[0])))]
+        main_header.append("Class") # Make the class column parallel with the y_train column
+        main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        new_tables = myutils.group_by(main_table,main_header,"Class")
+        header, new_tables = myutils.split_on_header(new_tables)
+        for new_table in new_tables:
+            for attribute_index in range(len(main_header) - 1):
+                values, non_counts = myutils.get_frequencies(main_table,main_header,main_header[attribute_index])
+                counts = myutils.get_frequencies(new_table,main_header,main_header[attribute_index])
+                all_counts = myutils.convert_nonpresent_freq_to_zero(values,counts)
+                value_list.append(values)
+                count_list.append(all_counts)
+            priors.append(len(new_table)/len(X_train))
+            values_list.append(value_list)
+            counts_list.append(count_list)
+            value_list, count_list = [], []
+        self.posteriors = myutils.convert_freqs_to_table(values_list,counts_list,header)
+        self.priors = priors
+
+    def predict(self, X_test):
+        """Makes predictions for test instances in X_test.
+
+        Args:
+            X_test(list of list of obj): The list of testing samples
+                The shape of X_test is (n_test_samples, n_features)
+
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test)
+        """
+        header, posterior_table = myutils.split_on_header(self.posteriors)
+        class_attributes = myutils.get_column(posterior_table,header,"class")
+        y_predicted, currval_posteriors = [], []
+        # Creating a table with the header as the class attributes and the values as the associated posteriors
+        # Class attributes = header, currval_posteriors = data table of posteriors
+        for test_instance in X_test:
+            for value in test_instance:
+                for column_name in header:
+                    if value == column_name:
+                        currval_posteriors.append(myutils.get_column(posterior_table,header,column_name))
+            class_attribute_score = []
+            # Finding the probabilities for each class level attribute
+            for i, class_attribute in enumerate(class_attributes):
+                class_attribute_score.append(math.prod(myutils.get_column(currval_posteriors,class_attributes,class_attribute)) * self.priors[i])
+            # get the index of the max value in class_attribute_score
+            max_index = class_attribute_score.index(max(class_attribute_score))
+            y_predicted.append(class_attributes[max_index])
+            # reset variables for next test instance
+            currval_posteriors = []
+            class_attribute_score = []
+        return y_predicted
+
+class MyDecisionTreeClassifier:
+    """Represents a decision tree classifier.
+
+    Attributes:
+        X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+        y_train(list of obj): The target y values (parallel to X_train).
+            The shape of y_train is n_samples
+        tree(nested list): The extracted tree model.
+
+    Notes:
+        Loosely based on sklearn's DecisionTreeClassifier:
+            https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+        Terminology: instance = sample = row and attribute = feature = column
+    """
+    def __init__(self):
+        """Initializer for MyDecisionTreeClassifier.
+        """
+        self.X_train = None
+        self.y_train = None
+        self.tree = None
+
+    def fit(self, X_train, y_train):
+        """Fits a decision tree classifier to X_train and y_train using the TDIDT
+        (top down induction of decision tree) algorithm.
+
+        Args:
+            X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+            y_train(list of obj): The target y values (parallel to X_train)
+                The shape of y_train is n_train_samples
+
+        Notes:
+            Since TDIDT is an eager learning algorithm, this method builds a decision tree model
+                from the training data.
+            Build a decision tree using the nested list representation described in class.
+            On a majority vote tie, choose first attribute value based on attribute domain ordering.
+            Store the tree in the tree attribute.
+            Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
+        """
+        self.X_train = X_train
+        self.y_train = y_train
+        main_header = ["att" + str(i) for i in range(len(X_train[0]))]
+        main_header.append("class") # Make the class column parallel with the y_train column
+        main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        self.tree = myutils.tdidt([main_table,main_table],main_header)
+
+    def predict(self, X_test):
+        """Makes predictions for test instances in X_test.
+
+        Args:
+            X_test(list of list of obj): The list of testing samples
+                The shape of X_test is (n_test_samples, n_features)
+
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test)
+        """
+        y_predicted = []
+        for test_instance in X_test:
+            y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
+        return y_predicted
+
+    def print_decision_rules(self, attribute_names=None, class_name="class"):
+        """Prints the decision rules from the tree in the format
+        "IF att == val AND ... THEN class = label", one rule on each line.
+
+        Args:
+            attribute_names(list of str or None): A list of attribute names to use in the decision rules
+                (None if a list is not provided and the default attribute names based on indexes
+                (e.g. "att0", "att1", ...) should be used).
+            class_name(str): A string to use for the class name in the decision rules
+                ("class" if a string is not provided and the default name "class" should be used).
+        """
+        if attribute_names is None:
+            attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
+        myutils.print_decision_rules(self.tree,attribute_names,class_name)
+
+    # BONUS method
+    def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):
+        """BONUS: Visualizes a tree via the open source Graphviz graph visualization package and
+        its DOT graph language (produces .dot and .pdf files).
+
+        Args:
+            dot_fname(str): The name of the .dot output file.
+            pdf_fname(str): The name of the .pdf output file generated from the .dot file.
+            attribute_names(list of str or None): A list of attribute names to use in the decision rules
+                (None if a list is not provided and the default attribute names based on indexes
+                (e.g. "att0", "att1", ...) should be used).
+
+        Notes:
+            Graphviz: https://graphviz.org/
+            DOT language: https://graphviz.org/doc/info/lang.html
+            You will need to install graphviz in the Docker container as shown in class to complete this method.
+        """
+        vis = gv.Graph(dot_fname,engine="dot",format="pdf")
+        tree = myutils.traverse_tree(self.tree,None,vis,num=0)
+        # output the vis as a pdf
+        vis.render(pdf_fname)

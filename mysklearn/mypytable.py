@@ -1,16 +1,15 @@
-from mysklearn import myutils
 ##############################################
 # Programmer: Matthew Moore
 # Class: CptS 322-01, Spring 2022
-# Programming Assignment #4
-# 2/9/2022
+# Programming Assignment # 6
+# 3/25/2022
 # 
 # 
 # Description: This program is the blue print for the object of a python table which essentially
 # mimics the functionality of a Pandas Data Frame in many ways. I built the algorithm to manipulate
 # a table of data in a lot of ways, the most complex being the inner join and the full outer join.
 ##############################################
-
+from mysklearn import myutils
 import copy
 import csv
 import logging
@@ -385,5 +384,3 @@ class MyPyTable:
             other_row_outer.clear()
 
         return MyPyTable(self.column_names + other_not_key_header, new_table)
-
-

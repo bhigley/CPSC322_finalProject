@@ -1,6 +1,14 @@
 import numpy as np
 import math
 
+def discretize(value):
+    classes = ["2ND", "Champions", "E8", "F4", "R32", "R64", "R68", "S16"]
+    index = classes.index(value)
+    if index < 4 or index == 7:
+        return 0
+    else:
+        return 1
+
 def partition_instances(instances, split_attribute, attribute_domains, header):
     """Splits the instances into partitions based on an attribute
 

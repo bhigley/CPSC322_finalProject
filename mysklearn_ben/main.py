@@ -3,6 +3,7 @@ import myutils_ben as myutils
 from mypytable_ben import MyPyTable
 from myclassifiers_ben import MyDecisionTreeClassifier, MyDummyClassifier
 import numpy as np
+from myevaluation_ben import *
 
 bball_table = MyPyTable()
 bball_table.load_from_file("input_data/cbb.csv")
@@ -18,7 +19,7 @@ k = 10
 sum_accuracy_copy = 0
 
 # test_indexes = [(2*i) for i in range(20)]
-test_indexes = [np.random.randint(0,240) for i in range(25)]
+test_indexes = [np.random.randint(0,200) for i in range(25)] # R64 starts at table index 170
 print(test_indexes)
 
 j = 0

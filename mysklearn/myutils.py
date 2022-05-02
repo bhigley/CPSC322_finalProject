@@ -14,6 +14,16 @@ import numpy as np
 import math
 import graphviz as gv
 
+def create_table_from_parallel_lists(original_table,list_of_parallel_lists):
+    new_cols = []
+    new_cols_inner = []
+    for index in range(len(original_table.data)):
+        for parallel_list in list_of_parallel_lists:
+            stats_cols_inner.append(parallel_list[index])
+        new_cols.append(stats_cols_inner)
+        stats_cols_inner = []
+    return new_cols
+
 def print_decision_rules(tree):
     if tree[0] == "Leaf": # Leaf node case
         print("THEN",tree[1])
@@ -26,11 +36,6 @@ def print_decision_rules(tree):
                 print_decision_rules(tree[node_index])
                 if tree[0] == "Attribute":
                     print("IF",tree[1],"=",tree[2][1],"AND", end=" ")
-        
-        
-        
-                
-
 
 def convert_header_to_string(table):
     """ When the header is apart of the table, this is a good function to change just the header to a string

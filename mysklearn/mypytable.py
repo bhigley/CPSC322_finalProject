@@ -73,6 +73,7 @@ class MyPyTable:
         Notes:
             Raise ValueError on invalid col_identifier
         """
+        print(self.data)
         single_column = []
         for row in self.data:
             try:

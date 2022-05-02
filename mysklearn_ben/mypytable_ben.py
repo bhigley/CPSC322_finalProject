@@ -64,11 +64,13 @@ class MyPyTable:
         Notes:
             Raise ValueError on invalid col_identifier
         """
+        print("test")
         column_index = 0
         for item in self.column_names:
             if col_identifier == item:
                 break
             column_index += 1
+        print(column_index)
         column_list = []
         for row in self.data: # deep copy without import
             if include_missing_values is True:

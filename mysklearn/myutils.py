@@ -80,5 +80,37 @@ def discretize_doe_classification(y_column):
                 break
     return y_discretized
 
+def normalize(column):
+    # i = lower_index
+    # for i in range(higher_index): # iterates trhough each attribute
+    #     min = table[0][i]
+    #     max = table[0][i]
+    #     for row in table:
+    #         if row[i] > max:
+    #             max = row[i]
+    #         if row[i] < min:
+    #             min = row[i]
+    #     ran = max - min
+    #     for row in table:
+    #         row[i] = (row[i] - min) / ran
+    #     ran = 0
+    # print(table[5])
+    new_column = []
+    min = column[0]
+    max = column[0]
+    for value in column:
+        if value > max:
+            max = value
+        if value < min:
+            min = value
+    range = max - min
+    for value in column:
+        # value = (value - min) / range
+        new_column.append((value - min) / range)
+
+    print(new_column)
+
+    return new_column
+
 
 

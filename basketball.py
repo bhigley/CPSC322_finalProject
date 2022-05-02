@@ -52,17 +52,21 @@ for index in range(len(bball_table_test.data)):
 X_test = stats_cols
 stats_cols = []
 stats_col = []
-for stat in stats_header:
-    stats_col.append(bball_table.get_column(stat))
 
+# Grabbing all the rows we want to use
+for stat in stats_header:
+    stats_col.append(myutils.discretize(myutils.normalize(bball_table.get_column(stat))))
+stats_col.append(bball_table.get_column('SEED'))
+
+# Creating a new table with the rows based on the appropriate columns
 for index in range(len(bball_table.data)):
     for stat_col in stats_col:
         stats_cols_inner.append(stat_col[index])
     stats_cols.append(stats_cols_inner)
     stats_cols_inner = []
 
-X_train_bball_origin = [stats for stats in stats_cols]
 y_train_bball_origin = [val for val in bball_table.get_column('POSTSEASON')]
+X_train_bball_origin = stats_cols.copy()
 
 K_VALUE = 10
 print('===========================================')

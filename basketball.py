@@ -35,13 +35,14 @@ bball_table_test.load_from_file(fname)
     # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
 
 stats_header = ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
-    'DRB','FTR','3P_O','3P_D','ADJ_T','WAB','BARTHAG','ADJOE','ADJDE','EFG_O','EFG_D','BARTHAG','SEED']
+    'DRB','FTR','3P_O','3P_D','ADJ_T','WAB','BARTHAG','ADJOE','ADJDE','EFG_O','EFG_D','BARTHAG']#,'SEED']
 
 stats_cols = []
 stats_cols_inner = []
 stats_col = []
 for stat in stats_header:
-    stats_col.append(bball_table_test.get_column(stat))
+    stats_col.append(myutils.discretize(myutils.normalize(bball_table_test.get_column(stat))))
+stats_col.append(bball_table_test.get_column("SEED"))
 
 for index in range(len(bball_table_test.data)):
     for stat_col in stats_col:
@@ -63,6 +64,7 @@ for index in range(len(bball_table.data)):
 
 X_train_bball_origin = [stats for stats in stats_cols]
 y_train_bball_origin = [val for val in bball_table.get_column('POSTSEASON')]
+# y_train_bball__origin = myutils.discretizeY(y_train_bball_origin)
 
 K_VALUE = 10
 print('===========================================')

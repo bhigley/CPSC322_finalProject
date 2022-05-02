@@ -42,7 +42,7 @@ stats_cols_inner = []
 stats_col = []
 for stat in stats_header:
     stats_col.append(myutils.discretize(myutils.normalize(bball_table_test.get_column(stat))))
-# stats_col.append(bball_table_test.get_column("SEED"))
+stats_col.append(bball_table_test.get_column("SEED"))
 
 for index in range(len(bball_table_test.data)):
     for stat_col in stats_col:
@@ -65,83 +65,71 @@ for index in range(len(bball_table.data)):
 X_train_bball_origin = [stats for stats in stats_cols]
 y_train_bball_origin = [val for val in bball_table.get_column('POSTSEASON')]
 
-K_VALUE = 10
-print('===========================================')
-print("Predictive Accuracy")
-print('===========================================')
+bball_table = MyPyTable()
+bball_table.load_from_file("input_data/cbb.csv")
 
-X_train_folds, X_test_folds = myevaluation.stratified_kfold_cross_validation(X_train_bball_origin,y_train_bball_origin,n_splits=K_VALUE,shuffle=True)
-# print(X_train_folds[0], X_test_folds[0]) # testing
-X_train_bball, X_test_bball = [], []
-y_dummy_predictions_folds, y_knn_predictions_folds, y_nb_predictions_folds, y_tree_predictions_folds = [], [], [], []
-y_actuals_folds = []
-y_train_bball,y_test_bball = [], []
-# for i, X_train_fold in enumerate(X_train_folds):
-for i in range(1):
-    # for instance_index in X_train_fold:
-    for instance_index in X_train_folds[0]:
-        X_train_bball.append(X_train_bball_origin[instance_index])
-        y_train_bball.append(y_train_bball_origin[instance_index])
-    for instance_index in X_test_folds[i]:
-        X_test_bball.append(X_train_bball_origin[instance_index])
-        y_test_bball.append(y_train_bball_origin[instance_index])
-    tree_classifier = MyDecisionTreeClassifier()
-    tree_classifier.fit(X_train_bball, y_train_bball)
-    print(X_test_bball)
-    print(tree_classifier.predict(X_test_bball))
-#     knn_classifier = MyKNeighborsClassifier(K_VALUE)
-#     y_actuals_folds.append(y_test_bball)
-#     knn_classifier.fit(X_train_bball,y_train_bball)
-#     y_predictions = knn_classifier.predict(X_test_bball)
-#     y_knn_predictions_folds.append(y_predictions)
-#     dummy_classifier = MyDummyClassifier()
-#     dummy_classifier.fit(X_train_bball,y_train_bball)
-#     y_predictions = dummy_classifier.predict(X_test_bball)
-#     y_dummy_predictions_folds.append(y_predictions)
-#     nb_classifier = MyNaiveBayesClassifier()
-#     nb_classifier.fit(X_train_bball,y_train_bball)
-#     y_predictions = nb_classifier.predict(X_test_bball)
-#     y_nb_predictions_folds.append(y_predictions)
-#     tree_classifier = MyDecisionTreeClassifier()
-#     tree_classifier.fit(X_train_bball,y_train_bball)
-#     y_predictions = tree_classifier.predict(X_test_bball)
-#     y_tree_predictions_folds.append(y_predictions)
-#     X_train_bball, X_test_bball, y_train_bball, y_test_bball = [], [], [], []
-# # convert a nested list into a flat list
-# y_actuals_folds = [item for sublist in y_actuals_folds for item in sublist]
-# y_knn_predictions_folds = [item for sublist in y_knn_predictions_folds for item in sublist]
-# y_dummy_predictions_folds = [item for sublist in y_dummy_predictions_folds for item in sublist]
-# y_nb_predictions_folds = [item for sublist in y_nb_predictions_folds for item in sublist]
-# y_tree_predictions_folds = [item for sublist in y_tree_predictions_folds for item in sublist]
-# knn_accuracy = myevaluation.accuracy_score(y_actuals_folds,y_knn_predictions_folds,normalize=True)
-# # knn_precision = myevaluation.binary_precision_score(y_actuals_folds,y_knn_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# # knn_recall = myevaluation.binary_recall_score(y_actuals_folds,y_knn_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# dummy_accuracy = myevaluation.accuracy_score(y_actuals_folds,y_dummy_predictions_folds,normalize=True)
-# # dummy_precision = myevaluation.binary_precision_score(y_actuals_folds,y_dummy_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# # dummy_recall = myevaluation.binary_recall_score(y_actuals_folds,y_dummy_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# nb_accuracy = myevaluation.accuracy_score(y_actuals_folds,y_nb_predictions_folds,normalize=True)
-# # nb_precision = myevaluation.binary_precision_score(y_actuals_folds,y_nb_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# # nb_recall = myevaluation.binary_recall_score(y_actuals_folds,y_nb_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# tree_accuracy = myevaluation.accuracy_score(y_actuals_folds,y_tree_predictions_folds,normalize=True)
-# # tree_precision = myevaluation.binary_precision_score(y_actuals_folds,y_tree_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# # tree_recall = myevaluation.binary_recall_score(y_actuals_folds,y_tree_predictions_folds,labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"],pos_label="yes")
-# print("Stratified 10-Fold Cross Validation")
-# print("k Nearest Neighbors Classifier: ")
-# print("accuracy =",knn_accuracy,"error rate =",1 - knn_accuracy)
-# # print("precision =",knn_precision,"recall =",knn_recall)
-# # matrix = myevaluation.confusion_matrix(y_actuals_folds, y_knn_predictions_folds, labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"])
-# # print(tabulate(matrix,headers=["Champions","2ND","F4","E8","S16","R32","R64","R68"]))
-# print("Dummy Classifier: ")
-# print("accuracy =",dummy_accuracy,"error rate = ",1 - dummy_accuracy)
-# # print("precision =",dummy_precision,"recall =",dummy_recall)
-# # matrix = myevaluation.confusion_matrix(y_actuals_folds, y_dummy_predictions_folds, labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"])
-# # print(tabulate(matrix,headers=["Champions","2ND","F4","E8","S16","R32","R64","R68"]))
-# print("Naive Bayes Classifier: ")
-# print("accuracy =",nb_accuracy,"error rate = ",1 - nb_accuracy)
-# # print("precision =",nb_precision,"recall =",nb_recall)
-# # matrix = myevaluation.confusion_matrix(y_actuals_folds, y_nb_predictions_folds, labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"])
-# # print(tabulate(matrix,headers=["Champions","2ND","F4","E8","S16","R32","R64","R68"]))
-# print("Decision Tree Classifier: ")
-# print("accuracy =",tree_accuracy,"error rate = ",1 - tree_accuracy)
-# # print("precision =",tree_precision,"recall =",tree_recall)
-# # matrix = myevaluation.confusion_matrix(y_actuals_folds, y_tree_predictions_folds, labels=["Champions","2ND","F4","E8","S16","R32","R64","R68"])
+X = []
+y = []
+X_train = []
+X_test = []
+y_train = []
+y_test = []
+sum_accuracy = 0
+k = 10
+sum_accuracy_copy = 0
+
+# test_indexes = [(2*i) for i in range(20)]
+test_indexes = [np.random.randint(0,200) for i in range(25)] # R64 starts at table index 170
+print(test_indexes)
+
+j = 0
+for row in bball_table.data:
+    x_row = []
+    x_row.append(row[-1]) # tournament seed
+    x_row.append(row[-2])
+    if j in test_indexes:
+        X_test.append(x_row)
+        y_test.append(row[21])
+    else:
+        y.append(row[21]) # which team won
+        X.append(x_row)
+    j += 1
+
+
+# print(X_test, y_test)
+treeClassifier = MyDecisionTreeClassifier()
+treeClassifier.fit(X, y)
+dummyClassifier = MyDummyClassifier()
+dummyClassifier.fit(X, y)
+predictions_dummy = dummyClassifier.predict(X_test)
+predictions = treeClassifier.predict(X_test)
+
+j = 0
+correct = 0
+# print(predictions_dummy)
+print(predictions)
+print(y_test)
+
+for val in predictions:
+    if val == y_test[j]:
+        correct += 1
+    j += 1
+accuracy = correct / len(y_test)
+print("accuracy", accuracy)
+print("error", 1 - accuracy)
+# print(myevaluation.binary_precision_score(y_test, predictions))
+# print(myevaluation.binary_recall_score(y_test, predictions))
+j = 0
+correct = 0
+for item in predictions_dummy:
+    if item == y_test[j]:
+        correct += 1
+    j += 1
+accuracy = correct / len(y_test)
+print("accuracy", accuracy)
+print("error", 1 - accuracy)
+# print(myevaluation.binary_precision_score(y_test, predictions_dummy))
+# print(myevaluation.binary_recall_score(y_test, predictions_dummy))
+
+
+i = 0

@@ -519,20 +519,20 @@ def normalize(column):
 def discretize(column):
     new_column = []
     for value in column:
-        if value <= .1:
+        if value <= .7:
             value = 1
-        elif value <= .2:
-            value = 2
-        elif value <= .3:
-            value = 3
-        elif value <= .4:
-            value = 4
-        elif value <= .5:
-            value = 5
-        elif value <= .6:
-            value = 6
-        elif value <= .7:
-            value = 7
+        # elif value <= .2:
+        #     value = 2
+        # elif value <= .3:
+        #     value = 3
+        # elif value <= .4:
+        #     value = 4
+        # elif value <= .5:
+        #     value = 5
+        # elif value <= .6:
+        #     value = 6
+        # elif value <= .7:
+        #     value = 7
         elif value <= .8:
             value = 8
         elif value <= .9:

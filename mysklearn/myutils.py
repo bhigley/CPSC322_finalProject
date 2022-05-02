@@ -499,3 +499,46 @@ def remove_column(table,header,column_name):
         new_row = row[:col_index] + row[col_index+1:]
         new_table.append(new_row)
     return new_table
+
+def normalize(column):
+    new_column = []
+    min = column[0]
+    max = column[0]
+    for value in column:
+        if value > max:
+            max = value
+        if value < min:
+            min = value
+    range = max - min
+    for value in column:
+        # value = (value - min) / range
+        new_column.append((value - min) / range)
+    
+    return new_column
+
+def discretize(column):
+    new_column = []
+    for value in column:
+        if value <= .1:
+            value = 1
+        elif value <= .2:
+            value = 2
+        elif value <= .3:
+            value = 2
+        elif value <= .4:
+            value = 3
+        elif value <= .5:
+            value = 4
+        elif value <= .6:
+            value = 5
+        elif value <= .7:
+            value = 6
+        elif value <= .8:
+            value = 7
+        elif value <= .9:
+            value = 8
+        else:
+            value = 9
+        new_column.append(value)
+
+    return new_column

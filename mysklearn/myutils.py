@@ -500,22 +500,37 @@ def remove_column(table,header,column_name):
         new_table.append(new_row)
     return new_table
 
-def normalize(column):
-    new_column = []
-    min = column[0]
-    max = column[0]
-    for value in column:
-        if value > max:
-            max = value
-        if value < min:
-            min = value
-    range = max - min
-    for value in column:
-        # value = (value - min) / range
-        new_column.append((value - min) / range)
+def normalize(table):
+    i = 4
+    for i in range(-4): # iterates trhough each attribute
+        min = table[0][i]
+        max = table[0][i]
+        for row in table:
+            if row[i] > max:
+                max = row[i]
+            if row[i] < min:
+                min = row[i]
+        ran = max - min
+        for row in table:
+            row[i] = (row[i] - min) / ran
+        ran = 0
+    print(table[5])
+    # new_column = []
+    # min = column[0]
+    # max = column[0]
+    # for value in column:
+    #     if value > max:
+    #         max = value
+    #     if value < min:
+    #         min = value
+    # range = max - min
+    # for value in column:
+    #     # value = (value - min) / range
+    #     new_column.append((value - min) / range)
     
-    return new_column
+    # return new_column
 
+# def discretize(column):
 def discretize(column):
     new_column = []
     for value in column:

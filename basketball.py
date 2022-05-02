@@ -24,49 +24,51 @@ import math
 # importlib.reload(mysklearn.myevaluation)
 from tabulate import tabulate
 
-fname = os.path.join("input_data", "cbb.csv")
-bball_table = MyPyTable()
-bball_table.load_from_file(fname)
+# fname = os.path.join("input_data", "cbb.csv")
+# bball_table = MyPyTable()
+# bball_table.load_from_file(fname)
 
-fname = os.path.join("input_data", "cbb2022.csv")
-bball_table_test = MyPyTable()
-bball_table_test.load_from_file(fname)
-# stats_header = ['ADJOD','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
-    # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
+# fname = os.path.join("input_data", "cbb2022.csv")
+# bball_table_test = MyPyTable()
+# bball_table_test.load_from_file(fname)
+# # stats_header = ['ADJOD','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
+#     # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
 
-stats_header = ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
-    'DRB','FTR','3P_O','3P_D','ADJ_T','BARTHAG','ADJOE','ADJDE','EFG_O','EFG_D','BARTHAG']#,'WAB']#,'SEED']
+# stats_header = ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
+#     'DRB','FTR','3P_O','3P_D','ADJ_T','BARTHAG','ADJOE','ADJDE','EFG_O','EFG_D','BARTHAG']#,'WAB']#,'SEED']
 
-stats_cols = []
-stats_cols_inner = []
-stats_col = []
-for stat in stats_header:
-    stats_col.append(myutils.discretize(myutils.normalize(bball_table_test.get_column(stat))))
-stats_col.append(bball_table_test.get_column("SEED"))
+# stats_cols = []
+# stats_cols_inner = []
+# stats_col = []
+# for stat in stats_header:
+#     stats_col.append(myutils.discretize(myutils.normalize(bball_table_test.get_column(stat))))
+# stats_col.append(bball_table_test.get_column("SEED"))
 
-for index in range(len(bball_table_test.data)):
-    for stat_col in stats_col:
-        stats_cols_inner.append(stat_col[index])
-    stats_cols.append(stats_cols_inner)
-    stats_cols_inner = []
+# for index in range(len(bball_table_test.data)):
+#     for stat_col in stats_col:
+#         stats_cols_inner.append(stat_col[index])
+#     stats_cols.append(stats_cols_inner)
+#     stats_cols_inner = []
 
-X_test = stats_cols
-stats_cols = []
-stats_col = []
-for stat in stats_header:
-    stats_col.append(bball_table.get_column(stat))
+# X_test = stats_cols
+# stats_cols = []
+# stats_col = []
+# for stat in stats_header:
+#     stats_col.append(bball_table.get_column(stat))
 
-for index in range(len(bball_table.data)):
-    for stat_col in stats_col:
-        stats_cols_inner.append(stat_col[index])
-    stats_cols.append(stats_cols_inner)
-    stats_cols_inner = []
+# for index in range(len(bball_table.data)):
+#     for stat_col in stats_col:
+#         stats_cols_inner.append(stat_col[index])
+#     stats_cols.append(stats_cols_inner)
+#     stats_cols_inner = []
 
-X_train_bball_origin = [stats for stats in stats_cols]
-y_train_bball_origin = [val for val in bball_table.get_column('POSTSEASON')]
+# X_train_bball_origin = [stats for stats in stats_cols]
+# y_train_bball_origin = [val for val in bball_table.get_column('POSTSEASON')]
 
 bball_table = MyPyTable()
 bball_table.load_from_file("input_data/cbb.csv")
+
+myutils.normalize(bball_table.data)
 
 X = []
 y = []

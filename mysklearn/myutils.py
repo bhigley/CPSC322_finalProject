@@ -524,21 +524,89 @@ def discretize(column):
         elif value <= .2:
             value = 2
         elif value <= .3:
-            value = 2
-        elif value <= .4:
             value = 3
-        elif value <= .5:
+        elif value <= .4:
             value = 4
-        elif value <= .6:
+        elif value <= .5:
             value = 5
-        elif value <= .7:
+        elif value <= .6:
             value = 6
-        elif value <= .8:
+        elif value <= .7:
             value = 7
-        elif value <= .9:
+        elif value <= .8:
             value = 8
-        else:
+        elif value <= .9:
             value = 9
+        else:
+            value = 10
         new_column.append(value)
 
     return new_column
+
+def print_tree_helper(tree, rule, curr_att, attribute_names=None, class_name="class"):
+    """ Recursive helper function for printing the rules of a tree
+    Args:
+        tree(nested list): current subtree being passed recursively
+        rule(list): current rule being formed
+        curr_att(string): current attribute of tree to keep track of rules
+        attribute_names(list of str or None): A list of attribute names to use in the decision rules
+                (None if a list is not provided and the default attribute names based on indexes (e.g. "att0", "att1", ...) should be used).
+        class_name(str): A string to use for the class name in the decision rules
+                ("class" if a string is not provided and the default name "class" should be used).
+        
+    Returns:
+        tree[1]: (string) final leaf node in tree, used to end function
+    """
+
+    info_type = tree[0]
+
+    #checks if recursion needed
+    if info_type == "Attribute":
+
+        #gets current attribute and appends it to tree
+        curr_att = tree[1]
+        rule.append(tree[1])
+
+        #loops trhough all values in current subtree
+        for i in range(2, len(tree)):
+
+            #reforms current rule based on the current attribute
+            value_list = tree[i]
+            curr_index = len(rule) - 1
+            att_index = rule.index(curr_att)
+
+            #deletets item from current rule index of current attribute is found
+            while (curr_index != att_index):
+                del rule[-1]
+                curr_index -= 1
+
+            # appends new value to rule
+            rule.append("==")
+            rule.append(value_list[1])
+            rule.append("and")
+            
+            print_tree_helper(value_list[2], rule, curr_att, attribute_names, class_name)
+
+    # leaf is found
+    else: 
+
+        # Prints out a rule
+        print("If", end=" ")
+        del rule[-1]
+        for item in rule:
+            if isinstance(item,str):
+                if ("att" in item):
+                    if (attribute_names != None):
+                        print(attribute_names[int(item[3])], end= " ")
+                    else:
+                        print(item, end=" ")
+                else:
+                    print(item, end=" ")
+            else:
+                print(item, end=" ")
+        
+        print(", Then", class_name, "=", tree[1])
+        # print()
+
+        #returns last leaf to end function
+        return tree[1]

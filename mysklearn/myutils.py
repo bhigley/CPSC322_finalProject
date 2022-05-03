@@ -781,6 +781,15 @@ def discretizeY(column):
             new_column.append(2)
 
     return new_column
+
+def discretize_rounds_to_nums(rounds,rankings):
+    new_list = []
+    for round in rounds:
+        for ranking in rankings:
+            if round == ranking:
+                new_list.append(rankings.index(ranking))
+    return new_list
+
     
 def build_box_plot(title,x_attribute,y_attribute,data_table,data_header):
     plt.figure(figsize=(12,5))
@@ -791,3 +800,37 @@ def build_box_plot(title,x_attribute,y_attribute,data_table,data_header):
     plt.xticks(rotation=60,fontsize=12)
     plt.show()
     pass
+
+def basic_histogram(title,column_name,data):
+    plt.figure(figsize=(12,5))
+    plt.hist(data,bins=10)
+    plt.title(title + " by their " + column_name)
+    plt.xlabel(column_name)
+    plt.ylabel("Frequency of " + title)
+    plt.show()
+
+def build_scatter(title,x_name,y_name,x,y,m=None,b=None,covariance=None,labels=None):
+    """
+    Attributes:
+    title = string description of what the graph as a whole is representing
+    x_name = string description for what the x values represent
+    y_name = string description for what the y values represent
+    x , y = list of continuous values to plot on a corresponding (x,y) coordinate plane, must be parallel lists
+    m = optional slope attribute if the user would like to build in a line of best fit
+    b = optional y-intercept attribute if the user would like to generate line of best fit
+    covariance = optional covariance to visually add this value to the graph
+
+    build_scatter = the function as a whole creates a descriptive scatter plot graph with optional features
+    to make the final visual very easy to interpret
+    """
+    plt.figure(figsize=(12,5))
+    plt.scatter(x,y)
+    plt.title(title + " by their " + x_name + " and " + y_name)
+    plt.xlabel(x_name)
+    plt.ylabel(y_name)
+    if labels != None:
+        plt.xticks([0,1,2,3,4,5,6,7],labels)
+    if m != None and b != None and covariance != None:
+        plt.plot([min(x), max(x)],[m * min(x) + b, m * max(x) + b],c='r',lw=5,
+                    label='Corr Coeff = ' + str(round(m,4)) + ', Covariance = ' + str(round(covariance,3)))
+        plt.legend()

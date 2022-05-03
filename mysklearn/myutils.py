@@ -769,8 +769,10 @@ def discretizeY(column):
     for value in column:
         if value == "R64" or value == "R68" or value == "R32":
             new_column.append(0)
-        else:
+        elif value == "S16" or value == "E8":
             new_column.append(1)
+        else:
+            new_column.append(2)
 
     return new_column
     

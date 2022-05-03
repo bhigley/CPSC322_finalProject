@@ -14,10 +14,13 @@ import numpy as np
 import math
 import graphviz as gv
 import matplotlib.pyplot as plt
+from scipy import rand
 
-def compute_random_subset(values, num_values):
+def compute_random_subset(values, num_values, random_state=None):
     # used for F in RandomForest
     # there is a function np.random.choice()
+    if random_state is not None:
+        np.random.seed(random_state)
     values_copy = values[:] # shallow copy
     np.random.shuffle(values_copy) # in place shuffle
     return values_copy[:num_values]
@@ -216,7 +219,7 @@ def all_same_class(attribute_partition):
 #             majority_count = vote_count
 #     return majority
 
-def tdidt(current_instances, available_attributes, attribute_domains, header, F=None):
+def tdidt(current_instances, available_attributes, attribute_domains, header, F=None, random_state=None):
     """Generatest the decision tree
         Args:
             current_instances : instances that haven't been made into a rule
@@ -231,7 +234,9 @@ def tdidt(current_instances, available_attributes, attribute_domains, header, F=
         attribute = select_attribute(current_instances, available_attributes, header)
     else:
         K_subsets = compute_random_subset(available_attributes, F) # getting random subset 
+        # print(K_subsets)
         attribute = select_attribute(current_instances, K_subsets, header)
+        # print(attribute)
     # attribute = select_attribute(current_instances, available_attributes, header)
     available_attributes.remove(attribute)
     tree = ["Attribute", attribute]

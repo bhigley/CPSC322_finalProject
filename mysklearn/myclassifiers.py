@@ -10,9 +10,6 @@
 ##############################################
 from fileinput import filename
 from re import M
-# from FinalProject.basketball import X_test
-# from turtle import dot
-# from FinalProject.basketball import X_test
 from mysklearn import myutils
 from mysklearn import myevaluation
 import operator as op
@@ -84,9 +81,11 @@ class MyRandomForestClassifier:
         # 2. using the remainder set, sample N bootstrap samples
         # generate N number of decision trees
         for i in range(N):
-            X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder)
+            X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder, random_state=random_state)
+            self.valid_set = y_out_of_bag
+            # print(self.valid_set)
             my_tree = MyDecisionTreeClassifier()
-            my_tree.fit(X_sample, y_sample, F)
+            my_tree.fit(X_sample, y_sample, F, random_state=random_state)
             tree_predictions = my_tree.predict(X_out_of_bag)
             tree_accuracys.append(myevaluation.accuracy_score(y_out_of_bag, tree_predictions)) # parallel with nTrees
             nTrees.append(my_tree) # all N trees generated (before M tree selection)
@@ -117,6 +116,11 @@ class MyRandomForestClassifier:
             tree_predictions = []
         
         return y_predicted
+
+    def print_trees_rules(self):
+        for tree in self.learners:
+            tree.print_decision_rules()
+            print("-------------------------------------------")
 
 class MySimpleLinearRegressionClassifier:
     """Represents a simple linear regression classifier that discretizes
@@ -435,7 +439,7 @@ class MyDecisionTreeClassifier:
         self.y_train = None
         self.tree = None
 
-    def fit(self, X_train, y_train, F=None):
+    def fit(self, X_train, y_train, F=None, random_state=None):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
 
@@ -468,7 +472,7 @@ class MyDecisionTreeClassifier:
             domain = []
         train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
         available_attributes = headert.copy()
-        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
+        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F, random_state)
         # self.X_train = X_train
         # self.y_train = y_train
         # main_header = ["att" + str(i) for i in range(len(X_train[0]))]

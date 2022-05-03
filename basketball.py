@@ -73,7 +73,7 @@ y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
 X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
-myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 200, 3, 7, 4)
+myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 20, 7)
 predictions = myForest.predict()
 for i in range(len(predictions)):
     if predictions[i] == myForest.y_test[i]:
@@ -84,7 +84,7 @@ print("accuracy:", (count/len(predictions)))
 # Step 2: Randomly generate 1/3 of data into a test set and 2/3 into a training set
 # X_train_bball, X_test_bball, y_train_bball, y_test_bball = myeval.train_test_split(X_train_bball, y_train_bball, test_size=0.33,random_state=10)
 # Step 4: Utilize bootstrap method to generate a forest of possible trees for training set
-n = 50
+# n = 50
 # tree_ratings = []
 # my_tree = MyDecisionTreeClassifier()
 # for i in range(n):

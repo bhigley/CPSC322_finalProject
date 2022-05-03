@@ -56,10 +56,12 @@ def test_random_forest_classifier_predict():
         ["Junior", "Python", "no", "yes"]
     ]
     y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+    predictions_desk = ["True", "False", "True", "True", "True"]
     myForest.fit(X_train_interview, y_train_interview, 9, 3, 2, random_state=0)
+    predictions = myForest.predict()
 
-
-    assert False is True
+    assert predictions == predictions_desk
+    # assert False is True
 
 # def test_decision_tree_classifier_fit():
 #     treeClassifier = MyDecisionTreeClassifier()

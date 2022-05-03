@@ -25,6 +25,7 @@ def test_random_forest_classifier_fit():
     y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
     
     myForest.fit(X_train_interview, y_train_interview, 9, 3, 2, random_state=0)
+    myForest.predict()
     assert False is True
 
 def test_random_forest_classifier_predict():

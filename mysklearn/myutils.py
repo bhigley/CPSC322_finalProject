@@ -14,6 +14,28 @@ import numpy as np
 import math
 import graphviz as gv
 
+def sort_in_place(alist, parallel_list=None):
+    """sorts the list without losing index or parallel list value
+
+        Args:
+            alist (list) : holds the data to be reorganized
+            parallel_list : holds corresponding class
+
+        Returns:
+            none
+
+        Notes:
+            there doesn't have to be a parallel list
+        """
+    for i in range(len(alist)):
+        # generate a random index to swap this value at i with
+        rand_index = np.random.randint(0, len(alist)) # rand int in [0, len(alist))
+        # do the swap
+        alist[i], alist[rand_index] = alist[rand_index], alist[i]
+        if parallel_list is not None:
+            parallel_list[i], parallel_list[rand_index] =\
+                parallel_list[rand_index], parallel_list[i]
+
 def create_table_from_parallel_lists(original_table,list_of_parallel_lists):
     new_cols = []
     new_cols_inner = []
@@ -67,6 +89,32 @@ def decision_traverse(tree,X_test_instance):
                         if tree[node_index][1] == attribute_value:
                             return decision_traverse(tree[node_index],X_test_instance)
         return decision_traverse(tree[2],X_test_instance)
+
+def tdidt_predict(header, tree, instance):
+    """Used to traverse the decision tree
+
+        Args:
+            header : list of strings holding attribute names
+
+        Returns:
+            the leaf value for a given instance
+        Notes:
+            recursive function
+        """
+    # recursively traverse tree to make a prediction
+    # are we at a leaf node (base case) or attribute node?
+    info_type = tree[0]
+    if info_type == "Leaf":
+        return tree[1] # label
+    # we are at an attribute
+    # find attribute value match for instance
+    # for loop
+    att_index = header.index(tree[1])
+    for i in range(2, len(tree)):
+        value_list = tree[i]
+        if value_list[1] == instance[att_index]:
+            # we have a match, recurse
+            return tdidt_predict(header, value_list[2], instance)
         
 
 def traverse_tree(tree, prev, vis, num):
@@ -620,3 +668,4 @@ def print_tree_helper(tree, rule, curr_att, attribute_names=None, class_name="cl
 
         #returns last leaf to end function
         return tree[1]
+    

@@ -11,6 +11,7 @@
 from fileinput import filename
 from re import M
 from turtle import dot
+# from FinalProject.basketball import X_test
 from mysklearn import myutils
 from mysklearn import myevaluation
 import operator as op
@@ -66,41 +67,37 @@ class MyRandomForestClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
-        tree_ratings = []
+        tree_accuracys = []
+        nTrees = []
+        mTrees = []
+        m_indexes = [i for i in range(M)] # used for updating mTrees
+
         np.random.seed(random_state) # if no random_state then not seeded
 
         # 1. split your dataset into a test set and a "remainder set"
         X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
-        print(X_remainder)
+        self.X_test = X_test
+        # print(X_remainder)
 
         # 2. using the remainder set, sample N bootstrap samples
-        # my_tree.fit(X_sample, y_sample)
-        # tree_predictions = my_tree.predict(X_out_of_bag)
-        # tree_ratings.append([i , myeval.accuracy_score(y_out_of_bag, tree_predictions)])
         # generate N number of decision trees
         for i in range(N):
             X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder)
             my_tree = MyDecisionTreeClassifier()
             my_tree.fit(X_sample, y_sample)
-            print(X_out_of_bag)
             tree_predictions = my_tree.predict(X_out_of_bag)
-            tree_ratings.append([i , myevaluation.accuracy_score(y_out_of_bag, tree_predictions)])
-        print(tree_ratings)
-         
-
-
-
-        for i in range(N): # generate N decision trees
-            pass
-        # self.X_train = X_train
-        # self.y_train = y_train
-        # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
-        # main_header.append("class") # Make the class column parallel with the y_train column
-        # main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        # self.tree = myutils.tdidt([main_table,main_table],main_header)
-        pass
+            tree_accuracys.append(myevaluation.accuracy_score(y_out_of_bag, tree_predictions)) # parallel with nTrees
+            nTrees.append(my_tree) # all N trees generated (before M tree selection)
+        zipped_list = list(zip(tree_accuracys, nTrees))
+        sorted_zip = sorted(zipped_list, key=lambda x: x[0])
+        unzipped_list = list(zip(*sorted_zip))
+        mAccuracy, mTrees = list(unzipped_list[0]), list(unzipped_list[1])
+        mTrees = mTrees[-M:] # keeps only the top M trees
+        mAccuracy = mAccuracy[-M:]
+        print(mAccuracy)
+        self.learners = mTrees
     
-    def predict(self, X_test):
+    def predict(self):
         """Makes predictions for test instances in X_test.
 
         Args:
@@ -111,6 +108,9 @@ class MyRandomForestClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         y_predicted = []
+        for item in self.X_test:
+            for tree in self.learners:
+                print(tree.predict([item]))
         return y_predicted
 
 class MySimpleLinearRegressionClassifier:
@@ -465,10 +465,18 @@ class MyDecisionTreeClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-        y_predicted = []
-        for test_instance in X_test:
-            y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
-        return y_predicted
+        # y_predicted = []
+        # for test_instance in X_test:
+        #     y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
+        # return y_predicted
+        header = []
+        for i in range(len(X_test[0])):
+            att_num = str(i)
+            header.append("att" + att_num)
+        predictions = []
+        for item in X_test:
+            predictions.append(myutils.tdidt_predict(header, self.tree, item))
+        return predictions
 
     def print_decision_rules(self, attribute_names=None, class_name="class"):
         """Prints the decision rules from the tree in the format
@@ -481,9 +489,10 @@ class MyDecisionTreeClassifier:
             class_name(str): A string to use for the class name in the decision rules
                 ("class" if a string is not provided and the default name "class" should be used).
         """
-        if attribute_names is None:
-            attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
-        myutils.print_decision_rules_helper(self.tree)
+        # if attribute_names is None:
+        #     attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
+        # myutils.print_decision_rules_helper(self.tree)
+        myutils.print_tree_helper(self.tree, [], self.tree[0])
 
     # BONUS method
     def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):

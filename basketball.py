@@ -35,7 +35,7 @@ bball_table_test.load_from_file(fname)
     # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
 
 stats_header = ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
-    'DRB','FTR','3P_O','3P_D','ADJ_T','WAB','BARTHAG','ADJOE','ADJDE','EFG_O','EFG_D','BARTHAG']#,'SEED']
+    'DRB','FTR','3P_O','3P_D','ADJ_T','WAB']#,'SEED']
 
 stats_cols = []
 stats_cols_inner = []

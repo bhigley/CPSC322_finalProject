@@ -763,4 +763,14 @@ def print_tree_helper(tree, rule, curr_att, attribute_names=None, class_name="cl
 
         #returns last leaf to end function
         return tree[1]
+
+def discretizeY(column):
+    new_column = []
+    for value in column:
+        if value == "R64" or value == "R68" or value == "R32":
+            new_column.append(0)
+        else:
+            new_column.append(1)
+
+    return new_column
     

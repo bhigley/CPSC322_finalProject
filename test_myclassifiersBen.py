@@ -23,12 +23,42 @@ def test_random_forest_classifier_fit():
         ["Junior", "Python", "no", "yes"]
     ]
     y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
-    
+    X_test_desk = [['Junior', 'Python', 'no', 'no'], ['Mid', 'Java', 'yes', 'no'], \
+        ['Mid', 'Python', 'no', 'yes'], ['Junior', 'Python', 'yes', 'no'], ['Senior', 'Python', 'no', 'no']]
+    y_test_desk = ['True', 'True', 'True', 'True', 'False']
+    valid_set_desk = ['False', 'False', 'False']
     myForest.fit(X_train_interview, y_train_interview, 9, 3, 2, random_state=0)
-    print(myForest.predict())
-    assert False is True
+
+    assert X_test_desk == myForest.X_test
+    assert y_test_desk == myForest.y_test
+    assert valid_set_desk == myForest.valid_set
+    assert len(myForest.learners) == 3
+
+    # assert False is True
 
 def test_random_forest_classifier_predict():
+    myForest = MyRandomForestClassifier()
+
+    X_train_interview = [
+        ["Senior", "Java", "no", "no"],
+        ["Senior", "Java", "no", "yes"],
+        ["Mid", "Python", "no", "no"],
+        ["Junior", "Python", "no", "no"],
+        ["Junior", "R", "yes", "no"],
+        ["Junior", "R", "yes", "yes"],
+        ["Mid", "R", "yes", "yes"],
+        ["Senior", "Python", "no", "no"],
+        ["Senior", "R", "yes", "no"],
+        ["Junior", "Python", "yes", "no"],
+        ["Senior", "Python", "yes", "yes"],
+        ["Mid", "Python", "no", "yes"],
+        ["Mid", "Java", "yes", "no"],
+        ["Junior", "Python", "no", "yes"]
+    ]
+    y_train_interview = ["False", "False", "True", "True", "True", "False", "True", "False", "True", "True", "True", "True", "True", "False"]
+    myForest.fit(X_train_interview, y_train_interview, 9, 3, 2, random_state=0)
+
+
     assert False is True
 
 # def test_decision_tree_classifier_fit():

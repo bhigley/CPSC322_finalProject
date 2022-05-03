@@ -24,7 +24,7 @@ def create_table_from_parallel_lists(original_table,list_of_parallel_lists):
         stats_cols_inner = []
     return new_cols
 
-def print_decision_rules(tree):
+def print_decision_rules_helper(tree):
     if tree[0] == "Leaf": # Leaf node case
         print("THEN",tree[1])
         return tree
@@ -33,7 +33,7 @@ def print_decision_rules(tree):
             print("IF",tree[1],"=",tree[2][1],"AND", end=" ")
         for node_index in range(len(tree)):
             if node_index > 1:
-                print_decision_rules(tree[node_index])
+                print_decision_rules_helper(tree[node_index])
                 if tree[0] == "Attribute":
                     print("IF",tree[1],"=",tree[2][1],"AND", end=" ")
 

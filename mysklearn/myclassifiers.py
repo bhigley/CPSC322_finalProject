@@ -9,12 +9,83 @@
 # data in the form of x and y, as well as seperate x values for testing purposes.  
 ##############################################
 from fileinput import filename
+from re import M
 from turtle import dot
 from mysklearn import myutils
 import operator as op
 import os
 import math
 import graphviz as gv
+
+class MyRandomForestClassifier:
+    """Represents a simple linear regression classifier that discretizes
+        predictions from a simple linear regressor (see MySimpleLinearRegressor).
+
+    Attributes:
+        discretizer(function): a function that discretizes a numeric value into
+            a string label. The function's signature is func(obj) -> obj
+        regressor(MySimpleLinearRegressor): the underlying regression model that
+            fits a line to x and y data
+
+    Notes:
+        Terminology: instance = sample = row and attribute = feature = column
+    """
+
+    def __init__(self):
+        """Initializer for MySimpleLinearClassifier.
+
+        Args:
+            discretizer(function): a function that discretizes a numeric value into
+                a string label. The function's signature is func(obj) -> obj
+            regressor(MySimpleLinearRegressor): the underlying regression model that
+                fits a line to x and y data (None if to be created in fit())
+        """
+        self.learners = None
+        self.X_test = None
+        self.valid_set = None
+    
+    def fit(self, X_train, y_train, N, M, F):
+        """Fits the m best decision trees to learners
+
+        Args:
+            X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+            y_train(list of obj): The target y values (parallel to X_train)
+                The shape of y_train is n_train_samples
+            N (int): The number of decision trees that will be generated
+            M (int): The number of best decision trees that will be kept
+            F (int): The size of the subsets of attributes for forcing diversity
+
+        Notes:
+            Since TDIDT is an eager learning algorithm, this method builds a decision tree model
+                from the training data.
+            Build a decision tree using the nested list representation described in class.
+            On a majority vote tie, choose first attribute value based on attribute domain ordering.
+            Store the tree in the tree attribute.
+            Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
+        """
+        # self.X_train = X_train
+        # self.y_train = y_train
+        # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
+        # main_header.append("class") # Make the class column parallel with the y_train column
+        # main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        # self.tree = myutils.tdidt([main_table,main_table],main_header)
+        pass
+    
+    def predict(self, X_test):
+        """Makes predictions for test instances in X_test.
+
+        Args:
+            X_test(list of list of obj): The list of testing samples
+                The shape of X_test is (n_test_samples, n_features)
+
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test)
+        """
+        y_predicted = []
+        for test_instance in X_test:
+            y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
+        return y_predicted
 
 class MySimpleLinearRegressionClassifier:
     """Represents a simple linear regression classifier that discretizes

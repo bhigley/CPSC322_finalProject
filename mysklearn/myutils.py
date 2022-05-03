@@ -543,6 +543,16 @@ def discretize(column):
 
     return new_column
 
+def discretizeY(column):
+    new_column = []
+    for value in column:
+        if value == "R64":
+            new_column.append(0)
+        else:
+            new_column.append(1)
+
+    return new_column
+
 def print_tree_helper(tree, rule, curr_att, attribute_names=None, class_name="class"):
     """ Recursive helper function for printing the rules of a tree
     Args:

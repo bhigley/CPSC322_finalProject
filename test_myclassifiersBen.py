@@ -61,6 +61,7 @@ def test_random_forest_classifier_predict():
     predictions = myForest.predict()
 
     assert predictions == predictions_desk
+
     # assert False is True
 
 # def test_decision_tree_classifier_fit():

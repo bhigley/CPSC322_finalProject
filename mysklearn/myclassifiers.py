@@ -10,7 +10,7 @@
 ##############################################
 from fileinput import filename
 from re import M
-from turtle import dot
+# from turtle import dot
 # from FinalProject.basketball import X_test
 from mysklearn import myutils
 from mysklearn import myevaluation
@@ -77,7 +77,7 @@ class MyRandomForestClassifier:
         # 1. split your dataset into a test set and a "remainder set"
         X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
         self.X_test = X_test
-        # print(X_remainder)
+        print(X_test)
 
         # 2. using the remainder set, sample N bootstrap samples
         # generate N number of decision trees
@@ -108,9 +108,14 @@ class MyRandomForestClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         y_predicted = []
+        tree_predictions = []
         for item in self.X_test:
             for tree in self.learners:
-                print(tree.predict([item]))
+                tree_predictions.append(tree.predict([item])) # item has to be a list
+            y_predicted.append(myutils.majority_vote(tree_predictions))
+            tree_predictions = []
+        print(y_predicted)
+        
         return y_predicted
 
 class MySimpleLinearRegressionClassifier:

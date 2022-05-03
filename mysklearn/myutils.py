@@ -14,27 +14,28 @@ import numpy as np
 import math
 import graphviz as gv
 
-def sort_in_place(alist, parallel_list=None):
-    """sorts the list without losing index or parallel list value
+def majority_vote(att_partition): # working for basic 1 element list
+    """Used to determine a clash
 
         Args:
-            alist (list) : holds the data to be reorganized
-            parallel_list : holds corresponding class
-
+            att_partition : the attributes partitioned
         Returns:
-            none
+            the majority vote
 
         Notes:
-            there doesn't have to be a parallel list
+            needed for clashes in decision tree
         """
-    for i in range(len(alist)):
-        # generate a random index to swap this value at i with
-        rand_index = np.random.randint(0, len(alist)) # rand int in [0, len(alist))
-        # do the swap
-        alist[i], alist[rand_index] = alist[rand_index], alist[i]
-        if parallel_list is not None:
-            parallel_list[i], parallel_list[rand_index] =\
-                parallel_list[rand_index], parallel_list[i]
+    majority = att_partition[0][-1]
+    majority_count = 0
+    for vote in att_partition:
+        vote_count = 0
+        for other_vote in att_partition:
+            if vote[-1] == other_vote[-1]:
+                vote_count += 1
+        if vote_count > majority_count:
+            majority = vote[-1]
+            majority_count = vote_count
+    return majority
 
 def create_table_from_parallel_lists(original_table,list_of_parallel_lists):
     new_cols = []

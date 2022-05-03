@@ -457,12 +457,27 @@ class MyDecisionTreeClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
-        self.X_train = X_train
-        self.y_train = y_train
-        main_header = ["att" + str(i) for i in range(len(X_train[0]))]
-        main_header.append("class") # Make the class column parallel with the y_train column
-        main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
+        headert = []
+        domain = []
+        domain_dict = {}
+        for i in range(len(X_train[0])):
+            att_num = str(i)
+            headert.append("att" + att_num)
+        self.header = headert
+        for i in range(len(X_train[0])):
+            for row in X_train:
+                domain.append(row[i])
+            domain_dict[headert[i]]= list(np.unique(domain))
+            domain = []
+        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        available_attributes = headert.copy()
+        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
+        # self.X_train = X_train
+        # self.y_train = y_train
+        # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
+        # main_header.append("class") # Make the class column parallel with the y_train column
+        # main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        # self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.

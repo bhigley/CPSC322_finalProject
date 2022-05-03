@@ -386,7 +386,7 @@ class MyDecisionTreeClassifier:
         """
         if attribute_names is None:
             attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
-        myutils.print_decision_rules(self.tree,attribute_names,class_name)
+        myutils.print_decision_rules_helper(self.tree)
 
     # BONUS method
     def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):

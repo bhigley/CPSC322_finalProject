@@ -157,6 +157,7 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
         n_samples(int): Number of samples to generate. If left to None (default) this is automatically
             set to the first dimension of X.
         random_state(int): integer used for seeding a random number generator for reproducible results
+
     Returns:
         X_sample(list of list of obj): The list of samples
         X_out_of_bag(list of list of obj): The list of "out of bag" samples (e.g. left-over samples)

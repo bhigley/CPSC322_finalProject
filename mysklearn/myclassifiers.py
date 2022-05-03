@@ -10,6 +10,7 @@
 ##############################################
 from fileinput import filename
 from re import M
+# from FinalProject.basketball import X_test
 # from turtle import dot
 # from FinalProject.basketball import X_test
 from mysklearn import myutils
@@ -77,14 +78,13 @@ class MyRandomForestClassifier:
         # 1. split your dataset into a test set and a "remainder set"
         X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
         self.X_test = X_test
-        print(X_test)
 
         # 2. using the remainder set, sample N bootstrap samples
         # generate N number of decision trees
         for i in range(N):
             X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder)
             my_tree = MyDecisionTreeClassifier()
-            my_tree.fit(X_sample, y_sample)
+            my_tree.fit(X_sample, y_sample, F)
             tree_predictions = my_tree.predict(X_out_of_bag)
             tree_accuracys.append(myevaluation.accuracy_score(y_out_of_bag, tree_predictions)) # parallel with nTrees
             nTrees.append(my_tree) # all N trees generated (before M tree selection)
@@ -94,7 +94,6 @@ class MyRandomForestClassifier:
         mAccuracy, mTrees = list(unzipped_list[0]), list(unzipped_list[1])
         mTrees = mTrees[-M:] # keeps only the top M trees
         mAccuracy = mAccuracy[-M:]
-        print(mAccuracy)
         self.learners = mTrees
     
     def predict(self):
@@ -109,12 +108,16 @@ class MyRandomForestClassifier:
         """
         y_predicted = []
         tree_predictions = []
+        self.learners[0].print_decision_rules()
+        print(self.X_test)
         for item in self.X_test:
-            for tree in self.learners:
-                tree_predictions.append(tree.predict([item])) # item has to be a list
+            # for tree in self.learners:
+            #     tree_predictions.append(tree.predict([item])) # item has to be a list
+            tree_predictions.append(self.learners[0].predict([item]))
             y_predicted.append(myutils.majority_vote(tree_predictions))
             tree_predictions = []
-        print(y_predicted)
+        
+        # print(y_predicted)
         
         return y_predicted
 
@@ -435,7 +438,7 @@ class MyDecisionTreeClassifier:
         self.y_train = None
         self.tree = None
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, F=None):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
 
@@ -444,6 +447,7 @@ class MyDecisionTreeClassifier:
                 The shape of X_train is (n_train_samples, n_features)
             y_train(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
+            F (int): used to constrain attribute selection and force diversity
 
         Notes:
             Since TDIDT is an eager learning algorithm, this method builds a decision tree model
@@ -458,7 +462,7 @@ class MyDecisionTreeClassifier:
         main_header = ["att" + str(i) for i in range(len(X_train[0]))]
         main_header.append("class") # Make the class column parallel with the y_train column
         main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        self.tree = myutils.tdidt([main_table,main_table],main_header)
+        self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.

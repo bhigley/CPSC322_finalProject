@@ -14,6 +14,13 @@ import numpy as np
 import math
 import graphviz as gv
 
+def compute_random_subset(values, num_values):
+    # used for F in RandomForest
+    # there is a function np.random.choice()
+    values_copy = values[:] # shallow copy
+    np.random.shuffle(values_copy) # in place shuffle
+    return values_copy[:num_values]
+
 def majority_vote(att_partition): # working for basic 1 element list
     """Used to determine a clash
 
@@ -215,14 +222,22 @@ def partition_instances(instances, split_attribute_index):
                 partitions[att_value].append(instance)
     return partitions
 
-def tdidt(current_instances, available_attributes):
+def tdidt(current_instances, available_attributes, F=None):
     # basic approach (uses recursion!!):
     # print("available_attributes:", available_attributes)
     # select an attribute to split on
-    attribute, attribute_index = select_attribute(current_instances, available_attributes)
+    if F == None:
+        attribute, attribute_index = select_attribute(current_instances, available_attributes) # commented out for RandomForest
+    else:
+        K_subsets = compute_random_subset(available_attributes[:-1], F) # getting random subset without class label
+        K_subsets.append(available_attributes[-1]) # adding class label
+        # print(available_attributes, "test")
+        # print(K_subsets, "ben")
+        attribute, attribute_index = select_attribute(current_instances, K_subsets) # added for RandomForest
     # print("splitting on attribute:", attribute, attribute_index)
     original_attributes = available_attributes[:]
     available_attributes.remove(attribute)
+    print(original_attributes, available_attributes)
     tree = ["Attribute", attribute]
     # group data by attribute domains (creates pairwise disjoint partitions)
     partitions = partition_instances(current_instances, attribute_index)
@@ -240,7 +255,8 @@ def tdidt(current_instances, available_attributes):
             value_subtree.append(["Leaf", att_partition[0][-1],len(att_partition),len(current_instances)])
             tree.append(value_subtree)
         #    CASE 2: no more attributes to select (clash) => handle clash w/majority vote leaf node
-        elif len(att_partition) > 0 and len(available_attributes) == 1:
+        # elif len(att_partition) > 0 and len(available_attributes) == 1:
+        elif (len(att_partition) > 0 and len(available_attributes) == 0):
             # print("CASE 2 no more attributes")
             class_values, class_counts = get_frequencies(att_partition,original_attributes,original_attributes[-1])
             i = class_counts.index(max(class_counts))

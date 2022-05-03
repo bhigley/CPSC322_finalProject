@@ -15,7 +15,7 @@ from scipy import stats
 from sklearn.neighbors import KNeighborsClassifier, kneighbors_graph
 from sklearn.linear_model import LinearRegression
 from mysklearn.mysimplelinearregressor import MySimpleLinearRegressor
-from mysklearn.myclassifiers import MySimpleLinearRegressionClassifier,\
+from mysklearn.myclassifiers import MyRandomForestClassifier, MySimpleLinearRegressionClassifier,\
     MyKNeighborsClassifier,\
     MyDummyClassifier,\
     MyNaiveBayesClassifier,\

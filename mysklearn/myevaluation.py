@@ -15,6 +15,7 @@
 ##############################################
 
 from mysklearn import myutils
+import numpy as np
 
 def train_test_split(X, y, test_size=0.33, random_state=None, shuffle=True):
     """Split dataset into train and test sets based on a test set size.
@@ -169,23 +170,32 @@ def bootstrap_sample(X, y=None, n_samples=None, random_state=None):
         Loosely based on sklearn's resample():
             https://scikit-learn.org/stable/modules/generated/sklearn.utils.resample.html
     """
-    X_sample, X_out_of_bag, X_indexes_used = list(), list(), list()
-    if y != None:
-        y_sample, y_out_of_bag = list(), list()
-    else:
-        y_sample, y_out_of_bag = None, None
-    n_samples = len(X) if n_samples == None else n_samples
-    random_indexes = myutils.randints(len(X),n_samples,random_state)
-    for sample in range(n_samples):
-        X_sample.append(X[random_indexes[sample]])
-        if y != None:
-            y_sample.append(y[random_indexes[sample]])
-        X_indexes_used.append(random_indexes[sample])
-    for i, X_instance in enumerate(X):
-        if i not in X_indexes_used:
-            X_out_of_bag.append(X[i])
-            if y != None:
-                y_out_of_bag.append(y[i])
+    np.random.seed(random_state)
+    if n_samples is None: # not sure if this is right
+        n_samples = len(X)
+    indexes = [i for i in range(len(X))] # build index list
+    X_sample = []
+    X_out_of_bag = []
+    y_sample = []
+    y_out_of_bag = []
+    # randomly select n_samples indexes from indexes
+    # selected goes into trainining set
+    # check trainng set and if an index is not in it, add it to test set
+    for i in range(n_samples):
+        index = indexes[np.random.randint(0, len(X))]
+        X_sample.append(X[index])
+        if y is not None:
+            y_sample.append(y[index])
+    for item in indexes:
+        if X[item] not in X_sample:
+            X_out_of_bag.append(X[item])
+            if y is not None:
+                y_out_of_bag.append(y[item])
+    if y is None:
+        y_sample = None
+        y_out_of_bag = None
+
+
     return X_sample, X_out_of_bag, y_sample, y_out_of_bag
 
 def confusion_matrix(y_true, y_pred, labels):

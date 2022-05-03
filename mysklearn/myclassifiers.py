@@ -12,10 +12,12 @@ from fileinput import filename
 from re import M
 from turtle import dot
 from mysklearn import myutils
+from mysklearn import myevaluation
 import operator as op
 import os
 import math
 import graphviz as gv
+import numpy as np
 
 class MyRandomForestClassifier:
     """Represents a simple linear regression classifier that discretizes
@@ -44,7 +46,7 @@ class MyRandomForestClassifier:
         self.X_test = None
         self.valid_set = None
     
-    def fit(self, X_train, y_train, N, M, F):
+    def fit(self, X_train, y_train, N, M, F, random_state=None):
         """Fits the m best decision trees to learners
 
         Args:
@@ -64,6 +66,32 @@ class MyRandomForestClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
+        tree_ratings = []
+        np.random.seed(random_state) # if no random_state then not seeded
+
+        # 1. split your dataset into a test set and a "remainder set"
+        X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
+        print(X_remainder)
+
+        # 2. using the remainder set, sample N bootstrap samples
+        # my_tree.fit(X_sample, y_sample)
+        # tree_predictions = my_tree.predict(X_out_of_bag)
+        # tree_ratings.append([i , myeval.accuracy_score(y_out_of_bag, tree_predictions)])
+        # generate N number of decision trees
+        for i in range(N):
+            X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder)
+            my_tree = MyDecisionTreeClassifier()
+            my_tree.fit(X_sample, y_sample)
+            print(X_out_of_bag)
+            tree_predictions = my_tree.predict(X_out_of_bag)
+            tree_ratings.append([i , myevaluation.accuracy_score(y_out_of_bag, tree_predictions)])
+        print(tree_ratings)
+         
+
+
+
+        for i in range(N): # generate N decision trees
+            pass
         # self.X_train = X_train
         # self.y_train = y_train
         # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
@@ -83,8 +111,6 @@ class MyRandomForestClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         y_predicted = []
-        for test_instance in X_test:
-            y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
         return y_predicted
 
 class MySimpleLinearRegressionClassifier:

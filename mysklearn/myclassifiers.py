@@ -46,6 +46,7 @@ class MyRandomForestClassifier:
         """
         self.learners = None
         self.X_test = None
+        self.y_test = None
         self.valid_set = None
     
     def fit(self, X_train, y_train, N, M, F, random_state=None):
@@ -78,6 +79,7 @@ class MyRandomForestClassifier:
         # 1. split your dataset into a test set and a "remainder set"
         X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
         self.X_test = X_test
+        self.y_test = y_test
 
         # 2. using the remainder set, sample N bootstrap samples
         # generate N number of decision trees
@@ -108,16 +110,11 @@ class MyRandomForestClassifier:
         """
         y_predicted = []
         tree_predictions = []
-        self.learners[0].print_decision_rules()
-        print(self.X_test)
         for item in self.X_test:
-            # for tree in self.learners:
-            #     tree_predictions.append(tree.predict([item])) # item has to be a list
-            tree_predictions.append(self.learners[0].predict([item]))
+            for tree in self.learners:
+                tree_predictions.append(tree.predict([item])) # item has to be a list
             y_predicted.append(myutils.majority_vote(tree_predictions))
             tree_predictions = []
-        
-        # print(y_predicted)
         
         return y_predicted
 
@@ -457,12 +454,27 @@ class MyDecisionTreeClassifier:
             Store the tree in the tree attribute.
             Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
         """
-        self.X_train = X_train
-        self.y_train = y_train
-        main_header = ["att" + str(i) for i in range(len(X_train[0]))]
-        main_header.append("class") # Make the class column parallel with the y_train column
-        main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
+        headert = []
+        domain = []
+        domain_dict = {}
+        for i in range(len(X_train[0])):
+            att_num = str(i)
+            headert.append("att" + att_num)
+        self.header = headert
+        for i in range(len(X_train[0])):
+            for row in X_train:
+                domain.append(row[i])
+            domain_dict[headert[i]]= list(np.unique(domain))
+            domain = []
+        train = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        available_attributes = headert.copy()
+        self.tree = myutils.tdidt(train, available_attributes, domain_dict, headert, F)
+        # self.X_train = X_train
+        # self.y_train = y_train
+        # main_header = ["att" + str(i) for i in range(len(X_train[0]))]
+        # main_header.append("class") # Make the class column parallel with the y_train column
+        # main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
+        # self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.

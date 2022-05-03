@@ -546,3 +546,41 @@ def test_decision_tree_classifier_predict():
     # TEST3: Use the 15 instance "iPhone" training set example from RQ5
     mydecision_tree.fit(X_train_iphone,y_train_iphone)
     assert mydecision_tree.predict(X_test_iphone) == ["yes","yes"]
+
+def test_random_forest_fit():
+    # TEST 1: Use the 14 instance "interview" training set example traced in class on the iPad
+    N_value,M_value,F_value = 9, 3, 2
+    # TODO: Fix these values
+    interview_solution_trees = [MyDecisionTreeClassifier() for i in range(N_value)]
+    bramer_solution_trees = [MyDecisionTreeClassifier() for i in range(M_value)]
+    iphone_solution_trees = [MyDecisionTreeClassifier() for i in range(F_value)]
+    myrandom_forest = MyRandomForestClassifier()
+    myrandom_forest.fit(myutils.table_by_columns(interview_table,interview_header,interview_header[:-1]),
+                            myutils.get_column(interview_table,interview_header,interview_header[-1]),N_value,M_value,F_value)
+    assert myrandom_forest.trees == interview_solution_trees
+    # TEST 2: Use the Bramer 4.1 Figure 4.3 degrees dataset example, 
+    # asserting against the trees you create when you finish Bramer 5.5 Self-assessment exercise 1
+    myrandom_forest.fit(myutils.table_by_columns(degrees_table,degrees_header,degrees_header[:-1]),
+                            myutils.get_column(degrees_table,degrees_header,degrees_header[-1]), N_value,M_value,F_value)
+    assert myrandom_forest.trees == bramer_solution_trees
+    # TEST3: Use the 15 instance "iPhone" training set example from RQ5
+    myrandom_forest.fit(X_train_iphone,y_train_iphone, N_value,M_value,F_value)
+    assert myrandom_forest.trees == iphone_solution_trees
+
+def test_random_forest_predict():
+    X_test_interview = [["Junior", "Java", "yes", "no"],["Junior", "Java", "yes", "yes"]]
+    X_test_bramer = [["B", "B", "B", "B", "B"], ["A", "A", "A", "A", "A"], ["A", "A", "A", "A", "B"]]
+    X_test_iphone = [[2,2,"fair"],[1,1,"excellent"]]
+    # TEST 1: Use the 14 instance "interview" training set example traced in class on the iPad
+    myrandom_forest = MyRandomForestClassifier()
+    myrandom_forest.fit(myutils.table_by_columns(interview_table,interview_header,interview_header[:-1]),
+                            myutils.get_column(interview_table,interview_header,interview_header[-1]))
+    assert myrandom_forest.predict(X_test_interview) == ["True","False"]
+    # TEST 2: Use the Bramer 4.1 Figure 4.3 degrees dataset example, 
+    # asserting against the trees you create when you finish Bramer 5.5 Self-assessment exercise 1
+    myrandom_forest.fit(myutils.table_by_columns(degrees_table,degrees_header,degrees_header[:-1]),
+                            myutils.get_column(degrees_table,degrees_header,degrees_header[-1]))
+    assert myrandom_forest.predict(X_test_bramer) == ["SECOND","FIRST","FIRST"]
+    # TEST3: Use the 15 instance "iPhone" training set example from RQ5
+    myrandom_forest.fit(X_train_iphone,y_train_iphone)
+    assert myrandom_forest.predict(X_test_iphone) == ["yes","yes"]

@@ -13,6 +13,7 @@ from platform import node
 import numpy as np
 import math
 import graphviz as gv
+import matplotlib.pyplot as plt
 
 def compute_random_subset(values, num_values):
     # used for F in RandomForest
@@ -776,3 +777,12 @@ def discretizeY(column):
 
     return new_column
     
+def build_box_plot(title,x_attribute,y_attribute,data_table,data_header):
+    plt.figure(figsize=(12,5))
+    plt.boxplot(data_table,labels=data_header)
+    plt.title(title + ' by ' + x_attribute + ' and ' + y_attribute)
+    plt.xlabel(x_attribute)
+    plt.ylabel(y_attribute)
+    plt.xticks(rotation=60,fontsize=12)
+    plt.show()
+    pass

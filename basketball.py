@@ -73,7 +73,7 @@ y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
 X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
-myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 240, 5, 7, 4)
+myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 200, 3, 7, 4)
 predictions = myForest.predict()
 for i in range(len(predictions)):
     if predictions[i] == myForest.y_test[i]:

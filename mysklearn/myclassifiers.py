@@ -113,7 +113,6 @@ class MyRandomForestClassifier:
         for item in self.X_test:
             for tree in self.learners:
                 tree_predictions.append(tree.predict([item])) # item has to be a list
-            # tree_predictions.append(self.learners[0].predict([item]))
             y_predicted.append(myutils.majority_vote(tree_predictions))
             tree_predictions = []
         

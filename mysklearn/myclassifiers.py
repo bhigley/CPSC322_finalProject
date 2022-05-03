@@ -9,12 +9,117 @@
 # data in the form of x and y, as well as seperate x values for testing purposes.  
 ##############################################
 from fileinput import filename
-from turtle import dot
+from re import M
+# from FinalProject.basketball import X_test
+# from turtle import dot
+# from FinalProject.basketball import X_test
 from mysklearn import myutils
+from mysklearn import myevaluation
 import operator as op
 import os
 import math
 import graphviz as gv
+import numpy as np
+
+class MyRandomForestClassifier:
+    """Represents a simple linear regression classifier that discretizes
+        predictions from a simple linear regressor (see MySimpleLinearRegressor).
+
+    Attributes:
+        discretizer(function): a function that discretizes a numeric value into
+            a string label. The function's signature is func(obj) -> obj
+        regressor(MySimpleLinearRegressor): the underlying regression model that
+            fits a line to x and y data
+
+    Notes:
+        Terminology: instance = sample = row and attribute = feature = column
+    """
+
+    def __init__(self):
+        """Initializer for MySimpleLinearClassifier.
+
+        Args:
+            discretizer(function): a function that discretizes a numeric value into
+                a string label. The function's signature is func(obj) -> obj
+            regressor(MySimpleLinearRegressor): the underlying regression model that
+                fits a line to x and y data (None if to be created in fit())
+        """
+        self.learners = None
+        self.X_test = None
+        self.valid_set = None
+    
+    def fit(self, X_train, y_train, N, M, F, random_state=None):
+        """Fits the m best decision trees to learners
+
+        Args:
+            X_train(list of list of obj): The list of training instances (samples).
+                The shape of X_train is (n_train_samples, n_features)
+            y_train(list of obj): The target y values (parallel to X_train)
+                The shape of y_train is n_train_samples
+            N (int): The number of decision trees that will be generated
+            M (int): The number of best decision trees that will be kept
+            F (int): The size of the subsets of attributes for forcing diversity
+
+        Notes:
+            Since TDIDT is an eager learning algorithm, this method builds a decision tree model
+                from the training data.
+            Build a decision tree using the nested list representation described in class.
+            On a majority vote tie, choose first attribute value based on attribute domain ordering.
+            Store the tree in the tree attribute.
+            Use attribute indexes to construct default attribute names (e.g. "att0", "att1", ...).
+        """
+        tree_accuracys = []
+        nTrees = []
+        mTrees = []
+        m_indexes = [i for i in range(M)] # used for updating mTrees
+
+        np.random.seed(random_state) # if no random_state then not seeded
+
+        # 1. split your dataset into a test set and a "remainder set"
+        X_remainder, X_test, y_remainder, y_test = myevaluation.train_test_split(X_train, y_train, random_state=random_state)
+        self.X_test = X_test
+
+        # 2. using the remainder set, sample N bootstrap samples
+        # generate N number of decision trees
+        for i in range(N):
+            X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder)
+            my_tree = MyDecisionTreeClassifier()
+            my_tree.fit(X_sample, y_sample, F)
+            tree_predictions = my_tree.predict(X_out_of_bag)
+            tree_accuracys.append(myevaluation.accuracy_score(y_out_of_bag, tree_predictions)) # parallel with nTrees
+            nTrees.append(my_tree) # all N trees generated (before M tree selection)
+        zipped_list = list(zip(tree_accuracys, nTrees))
+        sorted_zip = sorted(zipped_list, key=lambda x: x[0])
+        unzipped_list = list(zip(*sorted_zip))
+        mAccuracy, mTrees = list(unzipped_list[0]), list(unzipped_list[1])
+        mTrees = mTrees[-M:] # keeps only the top M trees
+        mAccuracy = mAccuracy[-M:]
+        self.learners = mTrees
+    
+    def predict(self):
+        """Makes predictions for test instances in X_test.
+
+        Args:
+            X_test(list of list of obj): The list of testing samples
+                The shape of X_test is (n_test_samples, n_features)
+
+        Returns:
+            y_predicted(list of obj): The predicted target y values (parallel to X_test)
+        """
+        y_predicted = []
+        tree_predictions = []
+        self.learners[0].print_decision_rules()
+        print(self.X_test)
+        for item in self.X_test:
+            # for tree in self.learners:
+            #     tree_predictions.append(tree.predict([item])) # item has to be a list
+            tree_predictions.append(self.learners[0].predict([item]))
+            y_predicted.append(myutils.majority_vote(tree_predictions))
+            tree_predictions = []
+        
+        # print(y_predicted)
+        
+        return y_predicted
 
 class MySimpleLinearRegressionClassifier:
     """Represents a simple linear regression classifier that discretizes
@@ -333,7 +438,7 @@ class MyDecisionTreeClassifier:
         self.y_train = None
         self.tree = None
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, F=None):
         """Fits a decision tree classifier to X_train and y_train using the TDIDT
         (top down induction of decision tree) algorithm.
 
@@ -342,6 +447,7 @@ class MyDecisionTreeClassifier:
                 The shape of X_train is (n_train_samples, n_features)
             y_train(list of obj): The target y values (parallel to X_train)
                 The shape of y_train is n_train_samples
+            F (int): used to constrain attribute selection and force diversity
 
         Notes:
             Since TDIDT is an eager learning algorithm, this method builds a decision tree model
@@ -356,7 +462,7 @@ class MyDecisionTreeClassifier:
         main_header = ["att" + str(i) for i in range(len(X_train[0]))]
         main_header.append("class") # Make the class column parallel with the y_train column
         main_table = [X_train[i] + [y_train[i]] for i in range(len(X_train))]
-        self.tree = myutils.tdidt([main_table,main_table],main_header)
+        self.tree = myutils.tdidt([main_table,main_table],main_header, F) # added F for attribute selection in randomforest
 
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
@@ -368,10 +474,18 @@ class MyDecisionTreeClassifier:
         Returns:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
-        y_predicted = []
-        for test_instance in X_test:
-            y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
-        return y_predicted
+        # y_predicted = []
+        # for test_instance in X_test:
+        #     y_predicted.append(myutils.decision_traverse(self.tree,test_instance))
+        # return y_predicted
+        header = []
+        for i in range(len(X_test[0])):
+            att_num = str(i)
+            header.append("att" + att_num)
+        predictions = []
+        for item in X_test:
+            predictions.append(myutils.tdidt_predict(header, self.tree, item))
+        return predictions
 
     def print_decision_rules(self, attribute_names=None, class_name="class"):
         """Prints the decision rules from the tree in the format
@@ -384,9 +498,10 @@ class MyDecisionTreeClassifier:
             class_name(str): A string to use for the class name in the decision rules
                 ("class" if a string is not provided and the default name "class" should be used).
         """
-        if attribute_names is None:
-            attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
-        myutils.print_decision_rules_helper(self.tree)
+        # if attribute_names is None:
+        #     attribute_names = ["att" + str(i) for i in range(len(self.X_train[0]))]
+        # myutils.print_decision_rules_helper(self.tree)
+        myutils.print_tree_helper(self.tree, [], self.tree[0])
 
     # BONUS method
     def visualize_tree(self, dot_fname, pdf_fname, attribute_names=None):

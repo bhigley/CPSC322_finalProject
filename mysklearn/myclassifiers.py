@@ -314,7 +314,7 @@ class MyDummyClassifier:
             Since Zero-R only predicts the most frequent class label, this method
                 only saves the most frequent class label.
         """
-        nvalues, nfreqs = myutils.get_frequencies(y_train,["class_label"],"class_label")
+        nvalues, nfreqs = myutils.get_frequencies(y_train,["class"],"class")
         self.most_common_label = nvalues[nfreqs.index(max(nfreqs))]
 
     def predict(self, X_test):

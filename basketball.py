@@ -30,6 +30,8 @@ fname = os.path.join("input_data", "cbb.csv")
 bball_table = MyPyTable()
 bball_table.load_from_file(fname)
 
+dummy = MyDummyClassifier()
+
 fname = os.path.join("input_data", "cbb2022.csv")
 bball_table_test = MyPyTable()
 bball_table_test.load_from_file(fname)
@@ -73,9 +75,12 @@ y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
 X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
-myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 10, 2, 7)
+myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 4, 7)
+dummy.fit(X_train_bball, y_train_bball)
 predictions = myForest.predict()
+pred = dummy.predict(X_test)
 print(myeval.accuracy_score(myForest.y_test, predictions))
+# print(myeval.accuracy_score(, pred))
 # print(myeval.accuracy_score(myForest.y_test, predictions))
 # predictions = myForest.predict()
 # for i in range(len(predictions)):

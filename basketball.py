@@ -33,6 +33,7 @@ bball_table.load_from_file(fname)
 fname = os.path.join("input_data", "cbb2022.csv")
 bball_table_test = MyPyTable()
 bball_table_test.load_from_file(fname)
+print(len(bball_table_test.get_column("TEAM")))
 # stats_header = ['ADJOD','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
     # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
 
@@ -53,6 +54,7 @@ for index in range(len(bball_table_test.data)):
     stats_cols_inner = []
 
 X_test = stats_cols.copy()
+print(len(X_test))
 stats_cols = []
 stats_col = []
 # Grabbing all the rows we want to use

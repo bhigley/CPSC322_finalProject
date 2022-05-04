@@ -749,17 +749,24 @@ def print_tree_helper(tree, rule, curr_att, attribute_names=None, class_name="cl
 
 def discretizeY(column):
     new_column = []
+    # for value in column:
+    #     if value == "R64" or value == "R68":
+    #         new_column.append(0)
+    #     elif value == "R32" or value == "S16":
+    #         new_column.append(1)
+    #     elif value == "F4" or value == "E8":
+    #         new_column.append(2)
+    #     elif value == "S16" or value == "E8":
+    #         new_column.append(3)
+    #     else:
+    #         new_column.append(4)
     for value in column:
-        if value == "R64" or value == "R68":
+        if value == "R64" or value == "R68" or value == "R32":
             new_column.append(0)
-        elif value == "R32" or value == "S16":
+        elif value == "S16" or "E8":
             new_column.append(1)
-        elif value == "F4" or value == "E8":
-            new_column.append(2)
-        elif value == "S16" or value == "E8":
-            new_column.append(3)
         else:
-            new_column.append(4)
+            new_column.append(2)
     return new_column
 
 def discretize_rounds_to_nums(rounds,rankings):

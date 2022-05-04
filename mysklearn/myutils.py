@@ -195,29 +195,6 @@ def all_same_class(attribute_partition):
     
     return True
 
-# def majority_vote(att_partition): # working for basic 1 element list
-#     """Used to determine a clash
-
-#         Args:
-#             att_partition : the attributes partitioned
-#         Returns:
-#             the majority vote
-
-#         Notes:
-#             needed for clashes in decision tree
-#         """
-#     majority = att_partition[0][-1]
-#     majority_count = 0
-#     for vote in att_partition:
-#         vote_count = 0
-#         for other_vote in att_partition:
-#             if vote[-1] == other_vote[-1]:
-#                 vote_count += 1
-#         if vote_count > majority_count:
-#             majority = vote[-1]
-#             majority_count = vote_count
-#     return majority
-
 def tdidt(current_instances, available_attributes, attribute_domains, header, F=None, random_state=None):
     """Generatest the decision tree
         Args:

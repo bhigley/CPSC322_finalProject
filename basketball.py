@@ -74,10 +74,9 @@ X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
 myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 10, 2, 7)
-print(myForest.X_test[0])
-myForest.X_test = [[5, 3, 9, 4, 4, 5, 6, 7, 6, 5, 5, 3, 8, 5.0]]
 predictions = myForest.predict()
-print(predictions)
+print(myeval.accuracy_score(myForest.y_test, predictions))
+# print(myeval.accuracy_score(myForest.y_test, predictions))
 # predictions = myForest.predict()
 # for i in range(len(predictions)):
 #     if predictions[i] == myForest.y_test[i]:

@@ -382,6 +382,7 @@ class MyNaiveBayesClassifier:
             values_list.append(value_list)
             counts_list.append(count_list)
             value_list, count_list = [], []
+    
         self.posteriors = myutils.convert_freqs_to_table(values_list,counts_list,header)
         self.priors = priors
 
@@ -396,6 +397,7 @@ class MyNaiveBayesClassifier:
             y_predicted(list of obj): The predicted target y values (parallel to X_test)
         """
         header, posterior_table = myutils.split_on_header(self.posteriors)
+        # print(self.posteriors)
         class_attributes = myutils.get_column(posterior_table,header,"class")
         y_predicted, currval_posteriors = [], []
         # Creating a table with the header as the class attributes and the values as the associated posteriors

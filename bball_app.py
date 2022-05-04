@@ -64,7 +64,7 @@ def predict():
     if prediction is not None:
         final = ""
         if prediction[0] == 0:
-            if np.random.randint(0, 9) < 3:
+            if np.random.randint(0, 9) < 4:
                 final = "Round of 32"
             else:
                 final = "Round of 64"

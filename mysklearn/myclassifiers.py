@@ -83,7 +83,6 @@ class MyRandomForestClassifier:
         for i in range(N):
             X_sample, X_out_of_bag, y_sample, y_out_of_bag = myevaluation.bootstrap_sample(X_remainder, y_remainder, random_state=random_state)
             self.valid_set = y_out_of_bag
-            # print(self.valid_set)
             my_tree = MyDecisionTreeClassifier()
             my_tree.fit(X_sample, y_sample, F, random_state=random_state)
             tree_predictions = my_tree.predict(X_out_of_bag)

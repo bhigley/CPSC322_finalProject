@@ -24,8 +24,6 @@ importlib.reload(mysklearn.myclassifiers)
 importlib.reload(mysklearn.myevaluation)
 from tabulate import tabulate
 
-
-
 np.random.seed(0)
 
 fname = os.path.join("input_data", "cbb.csv")
@@ -73,12 +71,16 @@ y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
 X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
-myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 20, 7)
+myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 10, 2, 7)
+print(myForest.X_test[0])
+myForest.X_test = [[5, 3, 9, 4, 4, 5, 6, 7, 6, 5, 5, 3, 8, 5.0]]
 predictions = myForest.predict()
-for i in range(len(predictions)):
-    if predictions[i] == myForest.y_test[i]:
-        count += 1
-print("accuracy:", (count/len(predictions)))
+print(predictions)
+# predictions = myForest.predict()
+# for i in range(len(predictions)):
+#     if predictions[i] == myForest.y_test[i]:
+#         count += 1
+# print("accuracy:", (count/len(predictions)))
 
 # Step 1: Discretize all of the stats columns into bins
 # Step 2: Randomly generate 1/3 of data into a test set and 2/3 into a training set

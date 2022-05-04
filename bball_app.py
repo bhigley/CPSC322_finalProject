@@ -1,7 +1,15 @@
 import importlib
+from tokenize import Double
 
-from mysklearn.mypytable import MyPyTable
-from FinalProject.mysklearn.mypytable import MyPyTable
+import mysklearn.myutils
+import mysklearn.myutils as myutils
+
+import mysklearn.mypytable
+from mysklearn.mypytable import MyPyTable 
+import numpy as np
+import mysklearn.myclassifiers
+from mysklearn.myclassifiers import MyRandomForestClassifier
+import mysklearn.myevaluation
 
 import os
 import pickle
@@ -16,13 +24,36 @@ def index():
 
 @app.route("/predict", methods=["Get"])
 def predict():
-    level = request.args.get("level") # "" default value
-    lang = request.args.get("lang")
-    tweets = request.args.get("Tweets")
-    phd = request.args.get("phd")
-    # print("level", level, lang, tweets, phd)
-    # TODO: fix the hardcoding
-    prediction = predict_interview_well([level, lang, tweets, phd])
+    print(my_forest.learners)
+    adjoe = request.args.get("ADJOE") # "" default value
+    adjde = request.args.get("ADJDE")
+    barthag = request.args.get("BARTHAG")
+    efg_o = request.args.get("EFG_O")
+    efg_d = request.args.get("EFG_D")
+    tor = request.args.get("TOR")
+    tord = request.args.get("TORD")
+    drb = request.args.get("DRB")
+    ftr = request.args.get("FTR")
+    p_o = request.args.get("3P_O")
+    p_d = request.args.get("3P_D")
+    adj_t = request.args.get("ADJ_T")
+    wab = request.args.get("WAB")
+    seed = request.args.get("SEED")
+    # print(adjoe, adjde, barthag, wab, seed)
+    # # predict?ADJOE=3&ADJDE=3&BARTHAG=8&EFG_O=4&EFG_D=2&_TOR=8&TORD=2&DRB=8&FTR=2&3p_O=1&3P_D=4&ADJ_T=5&WAB=6&SEED=9.0
+    # # print("level", level, lang, tweets, phd)
+    # # [3, 3, 8, 4, 2, 8, 2, 8, 2, 1, 4, 5, 6, 9.0]
+    # # ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
+    # # 'DRB','FTR','3P_O','3P_D','ADJ_T','WAB']
+    # # TODO: fix the hardcoding
+    # # prediction = predict_interview_well([level, lang, tweets, phd])
+    prediction = None
+    # my_forest.X_test = [[int(adjoe), int(adjde), int(barthag), int(efg_o), int(efg_d), int(tor), int(tord), int(drb), int(ftr), int(p_o), int(p_d), int(adj_t), int(wab), int(float(seed))]]
+    my_forest.X_test = [[10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1.0]]
+    print(my_forest.X_test)
+    my_forest.print_trees_rules()
+    prediction = my_forest.predict()
+    print(prediction, "test")
     # prediction = predict_interview_well(["junior", "Java", "yes", "no"])
     # # if anything goes wrong, predict_interview_well returns none
     if prediction is not None:
@@ -55,7 +86,9 @@ def home():
 
     y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
     X_train_bball = stats_cols.copy()
-    my_forest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 20, 7)
+    my_forest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 4, 2, 7, 0)
+    print(my_forest.learners)
+    return "<h1>Hello catrld!</h1>"
 
 def predict_interview_well(instance):
     # traverse interview tree

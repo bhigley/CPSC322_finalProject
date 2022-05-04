@@ -13,14 +13,10 @@ import mysklearn.myevaluation
 
 import os
 import pickle
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 my_forest = MyRandomForestClassifier()
-
-@app.route("/")
-def index():
-    return "<h1>Hello World!</h1>"
 
 @app.route("/predict", methods=["Get"])
 def predict():
@@ -39,29 +35,20 @@ def predict():
     adj_t = request.args.get("ADJ_T")
     wab = request.args.get("WAB")
     seed = request.args.get("SEED")
-    # print(adjoe, adjde, barthag, wab, seed)
-    # # predict?ADJOE=3&ADJDE=3&BARTHAG=8&EFG_O=4&EFG_D=2&_TOR=8&TORD=2&DRB=8&FTR=2&3p_O=1&3P_D=4&ADJ_T=5&WAB=6&SEED=9.0
-    # # print("level", level, lang, tweets, phd)
-    # # [3, 3, 8, 4, 2, 8, 2, 8, 2, 1, 4, 5, 6, 9.0]
-    # # ['ADJOE','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
-    # # 'DRB','FTR','3P_O','3P_D','ADJ_T','WAB']
-    # # TODO: fix the hardcoding
-    # # prediction = predict_interview_well([level, lang, tweets, phd])
-    prediction = None
-    # my_forest.X_test = [[int(adjoe), int(adjde), int(barthag), int(efg_o), int(efg_d), int(tor), int(tord), int(drb), int(ftr), int(p_o), int(p_d), int(adj_t), int(wab), int(float(seed))]]
+    # predict?ADJOE=3&ADJDE=3&BARTHAG=8&EFG_O=4&EFG_D=2&_TOR=8&TORD=2&DRB=8&FTR=2&3p_O=1&3P_D=4&ADJ_T=5&WAB=6&SEED=9.0
+    my_forest.X_test = [[int(adjoe), int(adjde), int(barthag), int(efg_o), int(efg_d), int(tor), int(tord), int(drb), int(ftr), int(p_o), int(p_d), int(adj_t), int(wab), int(float(seed))]]
     my_forest.X_test = [[10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 1.0]]
     print(my_forest.X_test)
     my_forest.print_trees_rules()
     prediction = my_forest.predict()
     print(prediction, "test")
-    # prediction = predict_interview_well(["junior", "Java", "yes", "no"])
-    # # if anything goes wrong, predict_interview_well returns none
+    # if prediction fails returns None
     if prediction is not None:
         result = {"prediction": prediction}
         return jsonify(result), 200
     return "Error making prediction", 400
 
-@app.route("/home", methods=["Get"])
+@app.route("/", methods=["Get"])
 def home():
     fname = os.path.join("input_data", "cbb.csv")
     bball_table = MyPyTable()
@@ -88,53 +75,9 @@ def home():
     X_train_bball = stats_cols.copy()
     my_forest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 4, 2, 7, 0)
     print(my_forest.learners)
-    return "<h1>Hello catrld!</h1>"
-
-def predict_interview_well(instance):
-    # traverse interview tree
-    # make a prediction for instance
-    # how do we get the tree here?
-    # save a trained ML mode from another process for use later
-    # enter pickling
-    # unpicle tree.p
-    infile = open("tree.p", "rb")
-    header, tree = pickle.load(infile)
-    header[2] = "Tweets"
-    print("tree:", tree)
-    infile.close()
-    # prediction time!!
-    try:
-        prediction = tdidt_predict(header, tree, instance)
-        return prediction
-    except:
-        print("error")
-        return None
-
-def tdidt_predict(header, tree, instance):
-    info_type = tree[0]
-    # print(info_type)
-    if info_type == "Leaf":
-        return tree[1] # label
-    # we are at an attribute
-    # find attribute value match for instance
-    # for loop
-    # print("Ben")
-    print(header, tree[1])
-    att_index = header.index(tree[1])
-    # print("cat")
-    # print(att_index)
-    for i in range(2, len(tree)):
-        # print("dog")
-        value_list = tree[i]
-        print("cat", value_list[1], instance[att_index])
-        if value_list[1] == instance[att_index]:
-            print("test", value_list[1], instance[att_index])
-            # we have a match, recurse
-            prediction = tdidt_predict(header, value_list[2], instance)
-            return prediction
+    # return "<h1>Hello catrld!</h1>"
+    return render_template('predict.html')
 
 if __name__ == "__main__":
     port = os.environ.get("PORT", 5000)
     app.run(debug=True, port=port, host="0.0.0.0") # TODO: make sure you turn off debug when you deploy
-    # prediction = predict_interview_well(["Junior", "java", "yes", "no"])
-    # print(prediction)

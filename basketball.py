@@ -24,17 +24,18 @@ importlib.reload(mysklearn.myclassifiers)
 importlib.reload(mysklearn.myevaluation)
 from tabulate import tabulate
 
-
-
 np.random.seed(0)
 
 fname = os.path.join("input_data", "cbb.csv")
 bball_table = MyPyTable()
 bball_table.load_from_file(fname)
 
+dummy = MyDummyClassifier()
+
 fname = os.path.join("input_data", "cbb2022.csv")
 bball_table_test = MyPyTable()
 bball_table_test.load_from_file(fname)
+print(len(bball_table_test.get_column("TEAM")))
 # stats_header = ['ADJOD','ADJDE','BARTHAG','EFG_O','EFG_D','TOR','TORD',\
     # 'ORB','DRB','FTR','FTRD','2P_O','2P_D','3P_O','3P_D','ADJ_T','WAB']
 
@@ -55,6 +56,7 @@ for index in range(len(bball_table_test.data)):
     stats_cols_inner = []
 
 X_test = stats_cols.copy()
+print(len(X_test))
 stats_cols = []
 stats_col = []
 # Grabbing all the rows we want to use
@@ -73,12 +75,18 @@ y_train_bball = [val for val in bball_table.get_column('POSTSEASON')]
 X_train_bball = stats_cols.copy()
 myForest = MyRandomForestClassifier()
 count = 0
-myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 20, 7)
+myForest.fit(X_train_bball, myutils.discretizeY(y_train_bball), 100, 4, 7)
+dummy.fit(X_train_bball, y_train_bball)
 predictions = myForest.predict()
-for i in range(len(predictions)):
-    if predictions[i] == myForest.y_test[i]:
-        count += 1
-print("accuracy:", (count/len(predictions)))
+pred = dummy.predict(X_test)
+print(myeval.accuracy_score(myForest.y_test, predictions))
+# print(myeval.accuracy_score(, pred))
+# print(myeval.accuracy_score(myForest.y_test, predictions))
+# predictions = myForest.predict()
+# for i in range(len(predictions)):
+#     if predictions[i] == myForest.y_test[i]:
+#         count += 1
+# print("accuracy:", (count/len(predictions)))
 
 # Step 1: Discretize all of the stats columns into bins
 # Step 2: Randomly generate 1/3 of data into a test set and 2/3 into a training set
